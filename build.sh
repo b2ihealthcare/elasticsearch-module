@@ -40,11 +40,11 @@ mkdir -p "$ES_DIR" "$REPO_DIR"
 cd "$BUILD_DIR" || exit
 
 # Download source zip
-if [ ! -f v"${VERSION}".zip ]; then
+if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
 	wget "$ES_SOURCE_URL"
 fi
 
-if [ ! -f v"${VERSION}".zip ]; then
+if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
 	echo "Failed to download v${VERSION}.zip."
 	exit 1
 fi
@@ -52,11 +52,11 @@ fi
 unzip -n v"${VERSION}".zip >/dev/null && echo "Unzipped Github repository content"
 
 # Download binary zip
-if [ ! -f "${ES_BINARY_FILE}".zip ]; then
+if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
 	wget "$ES_BINARY_URL"
 fi
 
-if [ ! -f "${ES_BINARY_FILE}".zip ]; then
+if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
 	echo "Failed to download ${ES_BINARY_FILE}.zip."
 	exit 1
 fi
