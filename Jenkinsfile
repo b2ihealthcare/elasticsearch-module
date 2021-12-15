@@ -12,7 +12,7 @@ try {
 
 	slack.notifyBuild()
 
-	node('build') {
+	node('docker') {
 
 		stage('Checkout repository') {
 			checkout scm
@@ -71,4 +71,5 @@ try {
 	throw e
 } finally {
 	slack.notifyBuild(currentBuild.result)
+	cleanWs()
 }
