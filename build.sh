@@ -271,10 +271,16 @@ function generate_lang_painless_spi() {
 	MODULE_TYPE="modules"
 
 	if [[ "${VERSION}" == 6* ]]; then
+
 		JAR_FILE=$(/bin/ls "$ES_DIR"/"$MODULE_TYPE"/lang-painless/elasticsearch-scripting-painless-spi-*.jar 2>/dev/null)
-	else
-		JAR_FILE=$(/bin/ls "$ES_DIR"/"$MODULE_TYPE"/lang-painless/spi/elasticsearch-scripting-painless-spi-*.jar 2>/dev/null)
+
+		if [ -n "$JAR_FILE" ]; then
+			mv "$JAR_FILE" "$ES_DIR/$MODULE_TYPE/lang-painless/spi" 2>/dev/null
+		fi
+
 	fi
+
+	JAR_FILE=$(/bin/ls "$ES_DIR"/"$MODULE_TYPE"/lang-painless/spi/elasticsearch-scripting-painless-spi-*.jar 2>/dev/null)
 
 	if [ -z "$JAR_FILE" ]; then
 		return
