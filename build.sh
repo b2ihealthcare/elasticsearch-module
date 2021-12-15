@@ -2,9 +2,6 @@
 
 BASE_DIR=$(pwd)
 
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
 VERSION=$1
 if [ -z "$VERSION" ]; then
 	echo "No version was specified."
