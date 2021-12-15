@@ -21,8 +21,8 @@ try {
 		stage('Build') {
 
 			withMaven(jdk: 'OpenJDK_11', maven: 'Maven_3.6.3', mavenSettingsConfig: custom_maven_settings, options: [artifactsPublisher(disabled: true)],  publisherStrategy: 'EXPLICIT') {
-				sh 'chmod +x build.sh'
-				sh 'build.sh '+targetVersion+' '+remoteRepositoryURL+' '+remoteRepositoryID+''
+				sh 'chmod +x ${WORKSPACE}/build.sh'
+				sh '${WORKSPACE}/build.sh '+targetVersion+' '+remoteRepositoryURL+' '+remoteRepositoryID+''
 			}
 
 		}
