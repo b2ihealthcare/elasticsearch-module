@@ -20,6 +20,38 @@ try {
 
 		stage('Build') {
 
+			sh 'mkdir target'
+
+			def esBinaryFileName
+			
+			if (targetVersion.startsWith("6")) {
+				esBinaryFileName = "elasticsearch-${targetVersion}"
+			} else {
+				esBinaryFileName = "elasticsearch-${targetVersion}-windows-x86_64"
+			}
+
+			fileOperations([
+				fileDownloadOperation(
+					password: '',
+					proxyHost: '',
+					proxyPort: '',
+					targetFileName: ''+esBinaryFileName+'.zip',
+					targetLocation: 'target',
+					url: 'https://artifacts.elastic.co/downloads/elasticsearch/'+esBinaryFileName+'.zip',
+					userName: '')
+			])
+
+			fileOperations([
+				fileDownloadOperation(
+					password: '',
+					proxyHost: '',
+					proxyPort: '',
+					targetFileName: 'v'+targetVersion+'',
+					targetLocation: 'target',
+					url: 'https://github.com/elastic/elasticsearch/archive/v'+targetVersion+'.zip',
+					userName: '')
+			])
+
 			withMaven(jdk: 'OpenJDK_11', maven: 'Maven_3.6.3', mavenSettingsConfig: custom_maven_settings, options: [artifactsPublisher(disabled: true)],  publisherStrategy: 'EXPLICIT') {
 				sh 'chmod +x ${WORKSPACE}/build.sh'
 				sh '${WORKSPACE}/build.sh '+targetVersion+' '+remoteRepositoryURL+' '+remoteRepositoryID+''
