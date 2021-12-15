@@ -10,7 +10,7 @@
 **/
 try {
 
-	slack.notifyBuild()
+	slack.notifyBuild('STARTED', targetVersion)
 
 	node('docker') {
 
