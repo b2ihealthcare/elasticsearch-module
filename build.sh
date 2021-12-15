@@ -403,8 +403,9 @@ for MODULE_NAME in $MODULE_NAMES; do
 
 done
 
-pushd "$REPO_DIR"/org/codelibs/elasticsearch >/dev/null || exit
-
-echo ""
-echo "List of generated poms:"
-find ./* -type f | grep pom$
+if [ -z "${REMOTE_REPOSITORY_URL}" ] && [ -z "${REMOTE_REPOSITORY_ID}" ]; then
+	pushd "$REPO_DIR"/org/codelibs/elasticsearch >/dev/null || exit
+	echo ""
+	echo "List of generated poms:"
+	find ./* -type f | grep pom$
+fi
