@@ -20,7 +20,8 @@ try {
 
 		stage('Build') {
 
-			sh 'mkdir target'
+			sh 'rm -rf ${WORKSPACE}/target'
+			sh 'mkdir ${WORKSPACE}/target'
 
 			def esBinaryFileName
 
@@ -46,7 +47,7 @@ try {
 					password: '',
 					proxyHost: '',
 					proxyPort: '',
-					targetFileName: 'v'+targetVersion+'',
+					targetFileName: 'v'+targetVersion+'.zip',
 					targetLocation: 'target',
 					url: 'https://github.com/elastic/elasticsearch/archive/v'+targetVersion+'.zip',
 					userName: '')
