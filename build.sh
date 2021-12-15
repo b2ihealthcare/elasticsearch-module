@@ -41,7 +41,7 @@ cd "$BUILD_DIR" || exit
 
 # Download source zip
 if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
-	wget "$ES_SOURCE_URL"
+	curl -sSOJ "$ES_SOURCE_URL"
 fi
 
 if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
@@ -53,7 +53,7 @@ unzip -n v"${VERSION}".zip >/dev/null && echo "Unzipped Github repository conten
 
 # Download binary zip
 if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
-	wget "$ES_BINARY_URL"
+	curl -sSOJ "$ES_BINARY_URL"
 fi
 
 if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
