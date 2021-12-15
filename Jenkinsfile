@@ -72,5 +72,4 @@ try {
 	throw e
 } finally {
 	slack.notifyBuild(currentBuild.result)
-	cleanWs()
 }
