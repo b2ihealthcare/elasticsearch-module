@@ -41,7 +41,7 @@ cd "$BUILD_DIR" || exit
 
 # Download source zip
 if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
-	curl -sSOJ "$ES_SOURCE_URL"
+	curl -sSL "$ES_SOURCE_URL" -o "v${VERSION}.zip"
 fi
 
 if [ ! -f "${BUILD_DIR}/v${VERSION}.zip" ]; then
@@ -53,7 +53,7 @@ unzip -n v"${VERSION}".zip >/dev/null && echo "Unzipped Github repository conten
 
 # Download binary zip
 if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
-	curl -sSOJ "$ES_BINARY_URL"
+	curl -sSOJL "$ES_BINARY_URL"
 fi
 
 if [ ! -f "${BUILD_DIR}/${ES_BINARY_FILE}.zip" ]; then
@@ -254,12 +254,10 @@ function deploy_files() {
 
 	if [ -n "${REMOTE_REPOSITORY_URL}" ] && [ -n "${REMOTE_REPOSITORY_ID}" ]; then
 		echo "Deploying $POM_FILE to remote repository"
-		mvn deploy:deploy-file -Durl="${REMOTE_REPOSITORY_URL}" -DrepositoryId="${REMOTE_REPOSITORY_ID}" -Dfile="$BINARY_FILE" -DpomFile="$POM_FILE"
-		mvn deploy:deploy-file -Durl="${REMOTE_REPOSITORY_URL}" -DrepositoryId="${REMOTE_REPOSITORY_ID}" -Dfile="$SOURCE_FILE" -DpomFile="$POM_FILE" -Dclassifier=sources
+		mvn deploy:deploy-file -Durl="${REMOTE_REPOSITORY_URL}" -DrepositoryId="${REMOTE_REPOSITORY_ID}" -Dfile="$BINARY_FILE" -Dsource="$SOURCE_FILE" -DpomFile="$POM_FILE"
 	else
 		echo "Deploying $POM_FILE to a local repository"
-		mvn deploy:deploy-file -Dgpg.skip=false -Durl=file:"$REPO_DIR" -Dfile="$BINARY_FILE" -DpomFile="$POM_FILE"
-		mvn deploy:deploy-file -Dgpg.skip=false -Durl=file:"$REPO_DIR" -Dfile="$SOURCE_FILE" -DpomFile="$POM_FILE" -Dclassifier=sources
+		mvn deploy:deploy-file -Dgpg.skip=false -Durl=file:"$REPO_DIR" -Dfile="$BINARY_FILE" -Dsources="$SOURCE_FILE" -DpomFile="$POM_FILE"
 	fi
 
 	popd >/dev/null || return
