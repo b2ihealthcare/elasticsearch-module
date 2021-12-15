@@ -254,7 +254,7 @@ function deploy_files() {
 
 	if [ -n "${REMOTE_REPOSITORY_URL}" ] && [ -n "${REMOTE_REPOSITORY_ID}" ]; then
 		echo "Deploying $POM_FILE to remote repository"
-		mvn deploy:deploy-file -Durl="${REMOTE_REPOSITORY_URL}" -DrepositoryId="${REMOTE_REPOSITORY_ID}" -Dfile="$BINARY_FILE" -Dsource="$SOURCE_FILE" -DpomFile="$POM_FILE"
+		mvn deploy:deploy-file -Durl="${REMOTE_REPOSITORY_URL}" -DrepositoryId="${REMOTE_REPOSITORY_ID}" -Dfile="$BINARY_FILE" -Dsources="$SOURCE_FILE" -DpomFile="$POM_FILE"
 	else
 		echo "Deploying $POM_FILE to a local repository"
 		mvn deploy:deploy-file -Dgpg.skip=false -Durl=file:"$REPO_DIR" -Dfile="$BINARY_FILE" -Dsources="$SOURCE_FILE" -DpomFile="$POM_FILE"
