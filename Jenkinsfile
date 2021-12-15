@@ -23,7 +23,7 @@ try {
 			sh 'mkdir target'
 
 			def esBinaryFileName
-			
+
 			if (targetVersion.startsWith("6")) {
 				esBinaryFileName = "elasticsearch-${targetVersion}"
 			} else {
@@ -51,6 +51,8 @@ try {
 					url: 'https://github.com/elastic/elasticsearch/archive/v'+targetVersion+'.zip',
 					userName: '')
 			])
+
+			sh 'ls -l ${WORKSPACE}/target'
 
 			withMaven(jdk: 'OpenJDK_11', maven: 'Maven_3.6.3', mavenSettingsConfig: custom_maven_settings, options: [artifactsPublisher(disabled: true)],  publisherStrategy: 'EXPLICIT') {
 				sh 'chmod +x ${WORKSPACE}/build.sh'
