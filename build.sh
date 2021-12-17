@@ -143,6 +143,9 @@ function generate_pom() {
 		elif [ "$JAR_NAME" = "reindex-client" ]; then
 			GROUP_ID="org.elasticsearch.plugin"
 			JAR_NAME="reindex-client"
+		elif [ "$JAR_NAME" = "reindex"  ] && [[ "${VERSION}" == 8* ]]; then
+			GROUP_ID="org.codelibs.elasticsearch.lib"
+			JAR_NAME="reindex"
 		elif [ -z "$GROUP_ID" ]; then
 			POMXML_FILE=$(jar tf "$JAR_FILE" | grep pom.xml)
 			jar xf "$JAR_FILE" "$POMXML_FILE"
