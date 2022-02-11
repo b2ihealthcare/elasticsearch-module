@@ -113,17 +113,22 @@ function generate_pom() {
 		sed -i 's/project(.:libs:elasticsearch-ssl-config.)/"org.elasticsearch:elasticsearch-ssl-config:${version}"/g' build.gradle
 
 		# shellcheck disable=SC2001
-		JAR_NAME=$(echo "$JAR_FILE" | sed -e "s/\(.*\)-[0-9].[0-9].*.jar/\1/g")
+		JAR_NAME=$(echo "$JAR_FILE" | sed -e "s/\(.*\)-[0-9][0-9]*\.[0-9][0-9]*.*.jar/\1/g")
 		# shellcheck disable=SC2001
-		JAR_VERSION=$(echo "$JAR_FILE" | sed -e "s/.*-\([0-9].[0-9].*\).jar/\1/g")
+		JAR_VERSION=$(echo "$JAR_FILE" | sed -e "s/.*-\([0-9][0-9]*\.[0-9][0-9]*.*\).jar/\1/g")
 
-		CLASSIFIER=$(grep ":$JAR_NAME:.*:" build.gradle | sed -e "s/.*\(compile\|api\|implementation\).*['\"].*:$JAR_NAME:.*:\(.*\)['\"]/\2/")
+		if echo "$JAR_NAME" | grep google-api-services-storage; then
+			JAR_VERSION=$(echo "$JAR_NAME" | sed -e "s/google-api-services-storage-//")-$JAR_VERSION
+			JAR_NAME=google-api-services-storage
+		fi
+
+		CLASSIFIER=$(grep ":$JAR_NAME:.*:" build.gradle | uniq | sed -e "s/.*\(compile\|api\|implementation\|runtimeOnly\).*['\"].*:$JAR_NAME:.*:\(.*\)['\"]/\2/")
 		if [ -n "$CLASSIFIER" ]; then
 			# shellcheck disable=SC2001
 			JAR_VERSION=$(echo "$JAR_VERSION" | sed -e "s/\-$CLASSIFIER$//")
 		fi
 
-		GROUP_ID=$(grep ":$JAR_NAME:" build.gradle | sed -e "s/.*\(compile\|api\|implementation\).*['\"]\(.*\):$JAR_NAME:.*/\2/")
+		GROUP_ID=$(grep ":$JAR_NAME:" build.gradle | uniq | sed -e "s/.*\(compile\|api\|implementation\|runtimeOnly\).*['\"]\(.*\):$JAR_NAME:.*/\2/")
 
 		if [ "$JAR_NAME" = "elasticsearch-scripting-painless-spi" ]; then
 			GROUP_ID="org.codelibs.elasticsearch.module"
@@ -143,7 +148,7 @@ function generate_pom() {
 		elif [ "$JAR_NAME" = "reindex-client" ]; then
 			GROUP_ID="org.elasticsearch.plugin"
 			JAR_NAME="reindex-client"
-		elif [ "$JAR_NAME" = "reindex"  ] && [[ "${VERSION}" == 8* ]]; then
+		elif [ "$JAR_NAME" = "reindex" ] && [[ "${VERSION}" == 8* ]]; then
 			GROUP_ID="org.codelibs.elasticsearch.lib"
 			JAR_NAME="reindex"
 		elif [ -z "$GROUP_ID" ]; then
@@ -152,6 +157,9 @@ function generate_pom() {
 			GROUP_ID=$(xmllint <"$POMXML_FILE" --format - | sed -e "s/<project [^>]*>/<project>/" | xmllint --xpath "/project/groupId/text()" - 2>/dev/null)
 			if [ -z "$GROUP_ID" ]; then
 				GROUP_ID=$(xmllint <"$POMXML_FILE" --format - | sed -e "s/<project [^>]*>/<project>/" | xmllint --xpath "/project/parent/groupId/text()" - 2>/dev/null)
+			fi
+			if [ "$JAR_NAME" = "azure-storage-blob" ]; then
+				JAR_VERSION=$(xmllint <"$POMXML_FILE" --format - | sed -e "s/<project [^>]*>/<project>/" | xmllint --xpath "/project/version/text()" -)
 			fi
 		fi
 
@@ -191,6 +199,16 @@ function generate_pom() {
 			echo '    </dependency>'
 		} >>"${POM_FILE}"
 
+	elif [ "$MODULE_NAME" = "lang-painless" ]; then
+
+		{
+			echo '    <dependency>'
+			echo '      <groupId>org.codelibs.elasticsearch.module</groupId>'
+			echo '      <artifactId>scripting-painless-spi</artifactId>'
+			echo '      <version>'"$MODULE_VERSION"'</version>'
+			echo '    </dependency>'
+		} >>"${POM_FILE}"
+
 	fi
 
 	{
@@ -199,18 +217,18 @@ function generate_pom() {
 		echo '  <licenses>'
 		echo '    <license>'
 		echo '      <name>Elastic License 2.0</name>'
-		echo '      <url>https://raw.githubusercontent.com/elastic/elasticsearch/'"v${VERSION}"'/licenses/ELASTIC-LICENSE-2.0.txt</url>'
+		echo '      <url>https://www.elastic.co/licensing/elastic-license</url>'
 		echo '      <distribution>repo</distribution>'
 		echo '    </license>'
 		echo '  </licenses>'
 		echo '  <developers>'
 		echo '    <developer>'
 		echo '      <name>Elastic</name>'
-		echo '      <url>http://www.elastic.co</url>'
+		echo '      <url>https://www.elastic.co</url>'
 		echo '    </developer>'
 		echo '    <developer>'
 		echo '      <name>CodeLibs</name>'
-		echo '      <url>http://www.codelibs.org/</url>'
+		echo '      <url>https://www.codelibs.org/</url>'
 		echo '    </developer>'
 		echo '  </developers>'
 		echo '  <name>'"$MODULE_NAME"'</name>'
