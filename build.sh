@@ -151,8 +151,14 @@ function generate_pom() {
 		elif [ "$JAR_NAME" = "reindex" ] && [[ "${VERSION}" == 8* ]]; then
 			GROUP_ID="org.codelibs.elasticsearch.lib"
 			JAR_NAME="reindex"
+		elif [ "$JAR_NAME" = "data-streams" ] && [[ "${VERSION}" == 8* ]]; then
+			GROUP_ID="org.codelibs.elasticsearch.module"
+			JAR_NAME="data-streams"
+		elif [ "$JAR_NAME" = "transport-netty4" ] && [[ "${VERSION}" == 8* ]]; then
+			GROUP_ID="org.codelibs.elasticsearch.module"
+			JAR_NAME="transport-netty4"
 		elif [ -z "$GROUP_ID" ]; then
-			POMXML_FILE=$(jar tf "$JAR_FILE" | grep pom.xml)
+			POMXML_FILE=$(jar tf "$JAR_FILE" | grep "$JAR_NAME" | grep pom.xml)
 			jar xf "$JAR_FILE" "$POMXML_FILE"
 			GROUP_ID=$(xmllint <"$POMXML_FILE" --format - | sed -e "s/<project [^>]*>/<project>/" | xmllint --xpath "/project/groupId/text()" - 2>/dev/null)
 			if [ -z "$GROUP_ID" ]; then
@@ -414,12 +420,33 @@ function generate_dissect() {
 
 }
 
+function generate_preallocate() {
+
+	MODULE_DIR=preallocate
+	MODULE_NAME=preallocate
+	MODULE_TYPE=libs
+
+	JAR_FILE=$(/bin/ls "$ES_DIR"/lib/*-preallocate-*.jar 2>/dev/null)
+
+	if [ -z "$JAR_FILE" ]; then
+		return
+	fi
+
+	cp "$JAR_FILE" "$ES_DIR/$MODULE_TYPE/$MODULE_NAME/$(basename "$JAR_FILE" | sed -e "s/elasticsearch-preallocate-/preallocate-/")"
+
+	generate_pom $MODULE_DIR $MODULE_NAME $MODULE_TYPE
+	generate_source $MODULE_DIR $MODULE_NAME $MODULE_TYPE
+	deploy_files $MODULE_DIR $MODULE_NAME $MODULE_TYPE
+
+}
+
 generate_lang_painless_spi
 generate_plugin_classloader
 generate_lz4
 generate_grok
 generate_ssl_config
 generate_dissect
+generate_preallocate
 
 MODULE_NAMES=$(find "${ES_DIR}/modules/" -mindepth 2 -maxdepth 2 -type f -name build.gradle | sed -e "s,.*/\([^/]*\)/build.gradle,\1,")
 
