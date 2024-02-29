@@ -55,7 +55,7 @@ try {
 
 			sh 'ls -l ${WORKSPACE}/target'
 
-			withMaven(jdk: 'OpenJDK_11', maven: 'Maven_3.6.3', globalMavenSettingsConfig: custom_maven_settings, options: [artifactsPublisher(disabled: true)],  publisherStrategy: 'EXPLICIT') {
+			withMaven(jdk: 'OpenJDK_17', maven: 'Maven_3.9.6', globalMavenSettingsConfig: custom_maven_settings, options: [artifactsPublisher(disabled: true)],  publisherStrategy: 'EXPLICIT') {
 				sh 'chmod +x ${WORKSPACE}/build.sh'
 				sh '${WORKSPACE}/build.sh "'+targetVersion+'" "'+remoteRepositoryURL+'" "'+remoteRepositoryID+'"'
 			}
